@@ -101,7 +101,15 @@ struct EditRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableI
 				}
 				return nil
 			}
-		
+
+		guard !outlines.contains(where: { $0.isLocked ?? false }) else {
+			for outline in outlines {
+				await outline.unload()
+			}
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		for row in rows {
 			switch detail {
 			case .topic:

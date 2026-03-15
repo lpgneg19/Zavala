@@ -29,19 +29,25 @@ struct GetImagesForOutlineAppIntent: AppIntent, CustomIntentMigratedAppIntent, P
         }
     }
 
+	@MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<[IntentFile]> {
-		await resume()
+		resume()
 
-		guard let outline = await findOutline(outline) else {
+		guard let outline = findOutline(outline) else {
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
 
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		var files = [IntentFile]()
 		
-		await outline.load()
+		outline.load()
 		
-		guard let imageGroups = await outline.images?.values, !imageGroups.isEmpty else {
+		guard let imageGroups = outline.images?.values, !imageGroups.isEmpty else {
 			await outline.unload()
 			await suspend()
 			return .result(value: files)

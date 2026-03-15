@@ -29,15 +29,21 @@ struct RemoveOutlineAppIntent: AppIntent, CustomIntentMigratedAppIntent, Predict
         }
     }
 
+	@MainActor
     func perform() async throws -> some IntentResult {
-		await resume()
+		resume()
 		
-		guard let outline = await findOutline(outline) else {
+		guard let outline = findOutline(outline) else {
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
-		
-		await outline.account?.deleteDocument(.outline(outline))
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
+		outline.account?.deleteDocument(.outline(outline))
 		
 		await suspend()
 		return .result()

@@ -84,26 +84,32 @@ struct EditOutlineAppIntent: AppIntent, CustomIntentMigratedAppIntent, Predictab
         }
     }
 
+	@MainActor
 	func perform() async throws -> some IntentResult & ReturnsValue<OutlineAppEntity> {
-		await resume()
+		resume()
 		
-		guard let outline = await findOutline(outline) else {
+		guard let outline = findOutline(outline) else {
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
-		
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		switch detail {
 		case .title:
-			await outline.update(title: title)
+			outline.update(title: title)
 		case .ownerName:
-			await outline.update(ownerName: ownerName)
+			outline.update(ownerName: ownerName)
 		case .ownerEmail:
-			await outline.update(ownerEmail: ownerEmail)
+			outline.update(ownerEmail: ownerEmail)
 		case .ownerURL:
-			await outline.update(ownerURL: ownerURL)
+			outline.update(ownerURL: ownerURL)
 		}
 		
 		await suspend()
-		return await .result(value: OutlineAppEntity(outline: outline))
+		return .result(value: OutlineAppEntity(outline: outline))
     }
 }

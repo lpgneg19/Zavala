@@ -44,7 +44,12 @@ struct AddRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIn
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
-		
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		outline.load()
 	
 		guard let rowContainer = outline.findRowContainer(entityID: entityID) else {

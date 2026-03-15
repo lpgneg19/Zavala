@@ -46,6 +46,11 @@ struct ExportAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableInt
 			throw ZavalaAppIntentError.outlineNotFound
 		}
 
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		let useAltLinks = exportLinkType == .altLinks
 		
 		var exportFile: IntentFile?

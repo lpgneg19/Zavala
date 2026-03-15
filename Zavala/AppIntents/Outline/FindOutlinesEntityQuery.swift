@@ -18,8 +18,12 @@ struct FindOutlinesEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 
 		var results = [OutlineAppEntity]()
 		for entityID in entityIDs {
-			if let outline = await appDelegate.accountManager.findDocument(entityID)?.outline {
-				await results.append(OutlineAppEntity(outline: outline))
+			if let entity = await MainActor.run(body: {
+				guard let outline = appDelegate.accountManager.findDocument(entityID)?.outline,
+					  outline.isLocked != true else { return nil as OutlineAppEntity? }
+				return OutlineAppEntity(outline: outline)
+			}) {
+				results.append(entity)
 			}
 		}
 
@@ -33,6 +37,7 @@ struct FindOutlinesEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 		let entities = appDelegate.accountManager.activeDocuments
 			.sorted(by: { ($0.title ?? "").caseInsensitiveCompare($1.title ?? "") == .orderedAscending })
 			.compactMap(\.outline)
+			.filter({ $0.isLocked != true })
 			.map({ OutlineAppEntity(outline: $0) })
 		await suspend()
 		return entities
@@ -94,6 +99,7 @@ struct FindOutlinesEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 
 		var entities = await MainActor.run {
 			appDelegate.accountManager.documents.compactMap(\.outline).filter { outline in
+				guard outline.isLocked != true else { return false }
 				let matches = comparators.map { $0.matches(outline) }
 				switch mode {
 				case .and:

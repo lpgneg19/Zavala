@@ -21,7 +21,11 @@ struct GetCurrentOutlineAppIntent: AppIntent, CustomIntentMigratedAppIntent {
 			  let outline = appDelegate.mainCoordinator?.selectedDocuments.first?.outline else {
 			throw ZavalaAppIntentError.outlineNotBeingViewed
 		}
-		
+
+		guard !(outline.isLocked ?? false) else {
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		return .result(value: OutlineAppEntity(outline: outline))
     }
 }

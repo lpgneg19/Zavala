@@ -44,7 +44,12 @@ struct MoveRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableI
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
-		
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		var outlines = Set<Outline>()
 		outline.load()
 		outlines.insert(outline)
@@ -109,6 +114,14 @@ struct MoveRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableI
 		for interOutlineMove in interOutlineMoves {
 			guard let sourceOutline = interOutlineMove.outline else {
 				continue
+			}
+
+			guard !(sourceOutline.isLocked ?? false) else {
+				for outline in outlines {
+					await outline.unload()
+				}
+				await suspend()
+				throw ZavalaAppIntentError.outlineIsLocked
 			}
 
 			let rowGroup = RowGroup(interOutlineMove)

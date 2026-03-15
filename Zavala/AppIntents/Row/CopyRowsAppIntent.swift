@@ -44,7 +44,12 @@ struct CopyRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableI
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
 		}
-		
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
+		}
+
 		var outlines = Set<Outline>()
 		outline.load()
 		outlines.insert(outline)

@@ -71,9 +71,16 @@ struct GetRowsAppIntent: DeprecatedAppIntent, CustomIntentMigratedAppIntent, Pre
         if let rowLink,
            let entityID = EntityID(url: rowLink),
 		   let outline = appDelegate.accountManager.findDocument(entityID)?.outline {
+
+			guard !(outline.isLocked ?? false) else {
+				await suspend()
+				throw ZavalaAppIntentError.outlineIsLocked
+			}
+
 			outline.load()
             defer { Task { await outline.unload() } }
-            if let row = outline.findRow(id: entityID.rowUUID) {
+
+			if let row = outline.findRow(id: entityID.rowUUID) {
                 await suspend()
                 return .result(value: [RowAppEntity(row: row)])
             } else {
@@ -90,6 +97,11 @@ struct GetRowsAppIntent: DeprecatedAppIntent, CustomIntentMigratedAppIntent, Pre
 		guard let outline = findOutline(entityID) else {
 			await suspend()
 			throw ZavalaAppIntentError.outlineNotFound
+		}
+
+		guard !(outline.isLocked ?? false) else {
+			await suspend()
+			throw ZavalaAppIntentError.outlineIsLocked
 		}
 
 		outline.load()

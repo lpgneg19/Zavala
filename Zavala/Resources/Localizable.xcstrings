@@ -12142,6 +12142,41 @@
         }
       }
     },
+    "label.text.intent-error-outline-is-locked": {
+      "comment": "Error text: The requested Outline was locked.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die angeforderte Gliederung war gesperrt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The requested Outline was locked."
+          }
+        },
+        "en-AU": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The requested Outline was locked."
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The requested Outline was locked."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求的大纲已被锁定。"
+          }
+        }
+      }
+    },
     "label.text.intent-error-outline-not-found": {
       "comment": "Error text: The requested Outline was not found.",
       "localizations": {

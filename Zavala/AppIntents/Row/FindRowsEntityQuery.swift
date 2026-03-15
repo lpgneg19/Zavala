@@ -19,12 +19,16 @@ struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 
 		var results = [RowAppEntity]()
 		for entityID in entityIDs {
-			if let outline = await appDelegate.accountManager.findDocument(entityID)?.outline {
-				await outline.load()
-				if let row = await outline.findRow(id: entityID.rowUUID) {
-					await results.append(RowAppEntity(row: row))
-				}
-				await outline.unload()
+			let entity = await MainActor.run(body: { () -> RowAppEntity? in
+				guard let outline = appDelegate.accountManager.findDocument(entityID)?.outline,
+					  outline.isLocked != true else { return nil }
+				outline.load()
+				defer { Task { await outline.unload() } }
+				guard let row = outline.findRow(id: entityID.rowUUID) else { return nil }
+				return RowAppEntity(row: row)
+			})
+			if let entity {
+				results.append(entity)
 			}
 		}
 
@@ -98,7 +102,7 @@ struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 
 			for document in documents {
 				await MainActor.run {
-					guard let outline = document.outline else { return }
+					guard let outline = document.outline, outline.isLocked != true else { return }
 					outline.load()
 					collectMatchingRows(from: outline.rows, comparators: comparators, mode: mode, into: &entities)
 				}
@@ -149,6 +153,8 @@ private extension FindRowsEntityQuery {
 	@MainActor
 	func findRowByURL(_ url: URL, comparators: [RowComparator], mode: ComparatorMode) -> RowAppEntity? {
 		guard let entityID = EntityID(url: url),
+			  let outline = appDelegate.accountManager.findDocument(entityID)?.outline,
+			  outline.isLocked != true,
 			  let row = appDelegate.accountManager.findRow(entityID) else {
 			return nil
 		}

@@ -44,6 +44,7 @@ enum ZavalaAppIntentError: Error, CustomLocalizedStringResourceConvertible {
 	case invalidDestinationForOutline
 	case outlineNotBeingViewed
 	case outlineNotFound
+	case outlineIsLocked
 	case noTagsSelected
 	case rowContainerNotFound
 	case unavailableAccount
@@ -57,6 +58,8 @@ enum ZavalaAppIntentError: Error, CustomLocalizedStringResourceConvertible {
 			return .entityIDRequired
 		case .invalidDestinationForOutline:
 			return .invalidDestinationForOutline
+		case .outlineIsLocked:
+			return .outlineIsLocked
 		case .outlineNotBeingViewed:
 			return .outlineNotBeingViewed
 		case .outlineNotFound:

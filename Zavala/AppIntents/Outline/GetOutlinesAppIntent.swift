@@ -115,8 +115,8 @@ private extension GetOutlinesAppIntent {
 
 	@MainActor
 	func filter(documents: [Document]) async -> [OutlineAppEntity] {
-		var documents = documents
-		
+		var documents = documents.filter({ !$0.isLocked })
+
 		switch accountType {
 		case .onMyDevice:
 			documents = documents.filter { $0.id.accountID == AccountType.local.rawValue }
