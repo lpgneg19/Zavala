@@ -72,6 +72,9 @@ struct FindOutlinesEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 		Property(\OutlineAppEntity.$tags) {
 			ContainsComparator { OutlineComparator.tagsContain($0) }
 		}
+		Property(\OutlineAppEntity.$url) {
+			EqualToComparator { OutlineComparator.urlEquals($0) }
+		}
 	}
 
 	nonisolated(unsafe) static var sortingOptions = SortingOptions {
@@ -157,6 +160,7 @@ enum OutlineComparator: Sendable {
 	case updatedBefore(Date)
 	case updatedAfter(Date)
 	case tagsContain(String)
+	case urlEquals(URL?)
 
 	@MainActor
 	func matches(_ outline: Outline) -> Bool {
@@ -199,6 +203,8 @@ enum OutlineComparator: Sendable {
 			return updated > date
 		case .tagsContain(let value):
 			return outline.tags.contains { $0.name.localizedStandardContains(value) }
+		case .urlEquals(let value):
+			return outline.id.url == value
 		}
 	}
 }

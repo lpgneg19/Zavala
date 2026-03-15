@@ -65,6 +65,9 @@ struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 			GreaterThanComparator { RowComparator.levelGreaterThan($0) }
 			GreaterThanOrEqualToComparator { RowComparator.levelGreaterThanOrEqual($0) }
 		}
+		Property(\RowAppEntity.$url) {
+			EqualToComparator { RowComparator.urlEquals($0) }
+		}
 	}
 
 	nonisolated(unsafe) static var sortingOptions = SortingOptions {
@@ -83,18 +86,25 @@ struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 
 		var entities = [RowAppEntity]()
 
-		let documents = await MainActor.run {
-			appDelegate.accountManager.documents
-		}
-
-		for document in documents {
-			await MainActor.run {
-				guard let outline = document.outline else { return }
-				outline.load()
-				collectMatchingRows(from: outline.rows, comparators: comparators, mode: mode, into: &entities)
+		// If a URL comparator is present, use direct lookup instead of scanning all documents
+		if let url = comparators.urlValue {
+			if let entity = await MainActor.run(body: { findRowByURL(url, comparators: comparators, mode: mode) }) {
+				entities.append(entity)
 			}
-			if let outline = await document.outline {
-				await outline.unload()
+		} else {
+			let documents = await MainActor.run {
+				appDelegate.accountManager.documents
+			}
+
+			for document in documents {
+				await MainActor.run {
+					guard let outline = document.outline else { return }
+					outline.load()
+					collectMatchingRows(from: outline.rows, comparators: comparators, mode: mode, into: &entities)
+				}
+				if let outline = await document.outline {
+					await outline.unload()
+				}
 			}
 		}
 
@@ -137,6 +147,29 @@ struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
 private extension FindRowsEntityQuery {
 
 	@MainActor
+	func findRowByURL(_ url: URL, comparators: [RowComparator], mode: ComparatorMode) -> RowAppEntity? {
+		guard let entityID = EntityID(url: url),
+			  let row = appDelegate.accountManager.findRow(entityID) else {
+			return nil
+		}
+
+		let entity = RowAppEntity(row: row)
+
+		// Apply any remaining non-URL comparators
+		let otherComparators = comparators.filter { !$0.isURLComparator }
+		guard !otherComparators.isEmpty else { return entity }
+
+		let matches = otherComparators.map { $0.matches(entity) }
+		switch mode {
+		case .and:
+			return matches.allSatisfy({ $0 }) ? entity : nil
+		case .or:
+			// In OR mode, the URL match already qualifies
+			return entity
+		}
+	}
+
+	@MainActor
 	func collectMatchingRows(from rows: [Row], comparators: [RowComparator], mode: ComparatorMode, into result: inout [RowAppEntity]) {
 		for row in rows {
 			let entity = RowAppEntity(row: row)
@@ -159,6 +192,19 @@ private extension FindRowsEntityQuery {
 
 // MARK: - RowComparator
 
+private extension [RowComparator] {
+
+	var urlValue: URL? {
+		for comparator in self {
+			if case .urlEquals(let url) = comparator {
+				return url
+			}
+		}
+		return nil
+	}
+
+}
+
 enum RowComparator: Sendable {
 	case topicEquals(String?)
 	case topicNotEquals(String?)
@@ -175,6 +221,12 @@ enum RowComparator: Sendable {
 	case levelLessThanOrEqual(Int?)
 	case levelGreaterThan(Int?)
 	case levelGreaterThanOrEqual(Int?)
+	case urlEquals(URL?)
+
+	var isURLComparator: Bool {
+		if case .urlEquals = self { return true }
+		return false
+	}
 
 	func matches(_ entity: RowAppEntity) -> Bool {
 		switch self {
@@ -212,6 +264,8 @@ enum RowComparator: Sendable {
 		case .levelGreaterThanOrEqual(let value):
 			guard let level = entity.level, let value else { return false }
 			return level >= value
+		case .urlEquals(let value):
+			return entity.url == value
 		}
 	}
 }

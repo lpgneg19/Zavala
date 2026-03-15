@@ -179,6 +179,24 @@ public final class AccountManager {
 		}
 	}
 	
+	public func findRow(_ entityID: EntityID) -> Row? {
+		switch entityID {
+		case .row(let accountID, let documentUUID, let rowUUID):
+			if let outline = findAccount(accountID: accountID)?.findDocument(documentUUID: documentUUID)?.outline {
+				outline.load()
+				let row = outline.findRow(id: rowUUID)
+				Task {
+					await outline.unload()
+				}
+				return row
+			} else {
+				return nil
+			}
+		default:
+			return nil
+		}
+	}
+
 	public func receiveRemoteNotification(userInfo: [AnyHashable : Any]) async {
 		await cloudKitAccount?.cloudKitManager?.receiveRemoteNotification(userInfo: userInfo)
 	}
