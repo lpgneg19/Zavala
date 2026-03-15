@@ -1,0 +1,217 @@
+//
+//  FindRowsAppIntent.swift
+//  Zavala
+//
+//  Created by Maurice Parker on 3/14/26.
+//
+
+import Foundation
+import AppIntents
+import VinOutlineKit
+import VinUtility
+
+struct FindRowsEntityQuery: EntityPropertyQuery, ZavalaAppIntent {
+
+	// MARK: - EntityQuery
+
+	func entities(for entityIDs: [RowAppEntity.ID]) async throws -> [RowAppEntity] {
+		await resume()
+
+		var results = [RowAppEntity]()
+		for entityID in entityIDs {
+			if let outline = await appDelegate.accountManager.findDocument(entityID)?.outline {
+				await outline.load()
+				if let row = await outline.findRow(id: entityID.rowUUID) {
+					await results.append(RowAppEntity(row: row))
+				}
+				await outline.unload()
+			}
+		}
+
+		await suspend()
+		return results
+	}
+
+	@MainActor
+	func suggestedEntities() async throws -> [RowAppEntity] {
+		return []
+	}
+
+	// MARK: - EntityPropertyQuery
+
+	nonisolated(unsafe) static var properties = QueryProperties {
+		Property(\RowAppEntity.$topic) {
+			EqualToComparator { RowComparator.topicEquals($0) }
+			NotEqualToComparator { RowComparator.topicNotEquals($0) }
+			ContainsComparator { RowComparator.topicContains($0) }
+		}
+		Property(\RowAppEntity.$note) {
+			EqualToComparator { RowComparator.noteEquals($0) }
+			NotEqualToComparator { RowComparator.noteNotEquals($0) }
+			ContainsComparator { RowComparator.noteContains($0) }
+		}
+		Property(\RowAppEntity.$complete) {
+			EqualToComparator { RowComparator.completeEquals($0) }
+			NotEqualToComparator { RowComparator.completeNotEquals($0) }
+		}
+		Property(\RowAppEntity.$expanded) {
+			EqualToComparator { RowComparator.expandedEquals($0) }
+			NotEqualToComparator { RowComparator.expandedNotEquals($0) }
+		}
+		Property(\RowAppEntity.$level) {
+			EqualToComparator { RowComparator.levelEquals($0) }
+			LessThanComparator { RowComparator.levelLessThan($0) }
+			LessThanOrEqualToComparator { RowComparator.levelLessThanOrEqual($0) }
+			GreaterThanComparator { RowComparator.levelGreaterThan($0) }
+			GreaterThanOrEqualToComparator { RowComparator.levelGreaterThanOrEqual($0) }
+		}
+	}
+
+	nonisolated(unsafe) static var sortingOptions = SortingOptions {
+		SortableBy(\RowAppEntity.$topic)
+		SortableBy(\RowAppEntity.$complete)
+		SortableBy(\RowAppEntity.$level)
+	}
+
+	func entities(
+		matching comparators: [RowComparator],
+		mode: ComparatorMode,
+		sortedBy: [Sort<RowAppEntity>],
+		limit: Int?
+	) async throws -> [RowAppEntity] {
+		await resume()
+
+		var entities = [RowAppEntity]()
+
+		let documents = await MainActor.run {
+			appDelegate.accountManager.documents
+		}
+
+		for document in documents {
+			await MainActor.run {
+				guard let outline = document.outline else { return }
+				outline.load()
+				collectMatchingRows(from: outline.rows, comparators: comparators, mode: mode, into: &entities)
+			}
+			if let outline = await document.outline {
+				await outline.unload()
+			}
+		}
+
+		if let primarySort = sortedBy.first {
+			entities.sort { lhs, rhs in
+				let ascending = primarySort.order == .ascending
+				switch primarySort.by {
+				case \RowAppEntity.$topic:
+					let result = (lhs.topic ?? "").localizedCaseInsensitiveCompare(rhs.topic ?? "")
+					return ascending ? result == .orderedAscending : result == .orderedDescending
+				case \RowAppEntity.$complete:
+					let lhsVal = lhs.complete ?? false
+					let rhsVal = rhs.complete ?? false
+					if lhsVal == rhsVal { return false }
+					return ascending ? !lhsVal : lhsVal
+				case \RowAppEntity.$level:
+					let lhsLevel = lhs.level ?? 0
+					let rhsLevel = rhs.level ?? 0
+					return ascending ? lhsLevel < rhsLevel : lhsLevel > rhsLevel
+				default:
+					return false
+				}
+			}
+		} else {
+			entities.sort { ($0.topic ?? "").localizedCaseInsensitiveCompare($1.topic ?? "") == .orderedAscending }
+		}
+
+		await suspend()
+
+		if let limit {
+			return Array(entities.prefix(limit))
+		}
+		return entities
+	}
+
+}
+
+// MARK: - Helpers
+
+private extension FindRowsEntityQuery {
+
+	@MainActor
+	func collectMatchingRows(from rows: [Row], comparators: [RowComparator], mode: ComparatorMode, into result: inout [RowAppEntity]) {
+		for row in rows {
+			let entity = RowAppEntity(row: row)
+			let matches = comparators.map { $0.matches(entity) }
+			let isMatch: Bool
+			switch mode {
+			case .and:
+				isMatch = matches.allSatisfy { $0 }
+			case .or:
+				isMatch = matches.contains { $0 }
+			}
+			if isMatch {
+				result.append(entity)
+			}
+			collectMatchingRows(from: row.rows, comparators: comparators, mode: mode, into: &result)
+		}
+	}
+
+}
+
+// MARK: - RowComparator
+
+enum RowComparator: Sendable {
+	case topicEquals(String?)
+	case topicNotEquals(String?)
+	case topicContains(String)
+	case noteEquals(String?)
+	case noteNotEquals(String?)
+	case noteContains(String)
+	case completeEquals(Bool?)
+	case completeNotEquals(Bool?)
+	case expandedEquals(Bool?)
+	case expandedNotEquals(Bool?)
+	case levelEquals(Int?)
+	case levelLessThan(Int?)
+	case levelLessThanOrEqual(Int?)
+	case levelGreaterThan(Int?)
+	case levelGreaterThanOrEqual(Int?)
+
+	func matches(_ entity: RowAppEntity) -> Bool {
+		switch self {
+		case .topicEquals(let value):
+			return entity.topic?.localizedCaseInsensitiveCompare(value ?? "") == .orderedSame
+		case .topicNotEquals(let value):
+			return entity.topic?.localizedCaseInsensitiveCompare(value ?? "") != .orderedSame
+		case .topicContains(let value):
+			return entity.topic?.localizedStandardContains(value) == true
+		case .noteEquals(let value):
+			return entity.note?.localizedCaseInsensitiveCompare(value ?? "") == .orderedSame
+		case .noteNotEquals(let value):
+			return entity.note?.localizedCaseInsensitiveCompare(value ?? "") != .orderedSame
+		case .noteContains(let value):
+			return entity.note?.localizedStandardContains(value) == true
+		case .completeEquals(let value):
+			return entity.complete == value
+		case .completeNotEquals(let value):
+			return entity.complete != value
+		case .expandedEquals(let value):
+			return entity.expanded == value
+		case .expandedNotEquals(let value):
+			return entity.expanded != value
+		case .levelEquals(let value):
+			return entity.level == value
+		case .levelLessThan(let value):
+			guard let level = entity.level, let value else { return false }
+			return level < value
+		case .levelLessThanOrEqual(let value):
+			guard let level = entity.level, let value else { return false }
+			return level <= value
+		case .levelGreaterThan(let value):
+			guard let level = entity.level, let value else { return false }
+			return level > value
+		case .levelGreaterThanOrEqual(let value):
+			guard let level = entity.level, let value else { return false }
+			return level >= value
+		}
+	}
+}

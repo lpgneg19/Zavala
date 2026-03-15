@@ -128,6 +128,8 @@
 		51AC4DCE2B360C76002FF9AD /* GetInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AC4DCD2B360C76002FF9AD /* GetInfoView.swift */; };
 		51B2B2C82563A2180090C56B /* EditorRowTopicTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B2B2C72563A2180090C56B /* EditorRowTopicTextView.swift */; };
 		51B2B2CE2563AAF60090C56B /* EditorRowContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B2B2CD2563AAF60090C56B /* EditorRowContentConfiguration.swift */; };
+		51B49BAE2F6618B100FDFE62 /* FindOutlinesEntityQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B49BAD2F6618B100FDFE62 /* FindOutlinesEntityQuery.swift */; };
+		51B49BB02F66EE3600FDFE62 /* FindRowsEntityQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B49BAF2F66EE3600FDFE62 /* FindRowsEntityQuery.swift */; };
 		51B5E5A82F5793440033090F /* ShortcutRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B5E5A72F57933F0033090F /* ShortcutRunner.swift */; };
 		51B5E5AB2F579B060033090F /* EditShortcutsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B5E5AA2F579B060033090F /* EditShortcutsMenuView.swift */; };
 		51B5E5AD2F579B060033090F /* EditShortcutsMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B5E5AC2F579B060033090F /* EditShortcutsMenuViewController.swift */; };
@@ -349,6 +351,8 @@
 		51AC4DCD2B360C76002FF9AD /* GetInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetInfoView.swift; sourceTree = "<group>"; };
 		51B2B2C72563A2180090C56B /* EditorRowTopicTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorRowTopicTextView.swift; sourceTree = "<group>"; };
 		51B2B2CD2563AAF60090C56B /* EditorRowContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorRowContentConfiguration.swift; sourceTree = "<group>"; };
+		51B49BAD2F6618B100FDFE62 /* FindOutlinesEntityQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindOutlinesEntityQuery.swift; sourceTree = "<group>"; };
+		51B49BAF2F66EE3600FDFE62 /* FindRowsEntityQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindRowsEntityQuery.swift; sourceTree = "<group>"; };
 		51B4B4A22C33402E005DCCEB /* GetCurrentOutlineAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetCurrentOutlineAppIntent.swift; sourceTree = "<group>"; };
 		51B4B4A32C33402E005DCCEB /* OutlineAppEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineAppEntity.swift; sourceTree = "<group>"; };
 		51B4B4A72C334D75005DCCEB /* EntityID+AppEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntityID+AppEntity.swift"; sourceTree = "<group>"; };
@@ -658,6 +662,7 @@
 				51A6A2DA2C39E63B002AFEC1 /* GetOutlinesAppIntent.swift */,
 				51A6A2E12C39E63B002AFEC1 /* RemoveOutlineAppIntent.swift */,
 				51A6A2E22C39E63B002AFEC1 /* RemoveOutlineTagAppIntent.swift */,
+				51B49BAD2F6618B100FDFE62 /* FindOutlinesEntityQuery.swift */,
 			);
 			path = Outline;
 			sourceTree = "<group>";
@@ -671,6 +676,7 @@
 				51A6A2DB2C39E63B002AFEC1 /* GetRowsAppIntent.swift */,
 				51A6A2DE2C39E63B002AFEC1 /* MoveRowsAppIntent.swift */,
 				51A6A2E32C39E63B002AFEC1 /* RemoveRowsAppIntent.swift */,
+				51B49BAF2F66EE3600FDFE62 /* FindRowsEntityQuery.swift */,
 			);
 			path = Row;
 			sourceTree = "<group>";
@@ -1160,6 +1166,7 @@
 				51DB0DCD27496CBE008312EC /* EditorTagInputPill.swift in Sources */,
 				51C4C449255AA215004E0206 /* MainSplitViewController.swift in Sources */,
 				51AC0A8E25741CF5003A7532 /* StackedUndoManager.swift in Sources */,
+				51B49BAE2F6618B100FDFE62 /* FindOutlinesEntityQuery.swift in Sources */,
 				5116894729BDA60E00318832 /* AboutViewController.swift in Sources */,
 				51B9D51725A9080A00579D19 /* EditorDisclosureButton.swift in Sources */,
 				51C71C6D273F087000F6C779 /* ImageScrollView.swift in Sources */,
@@ -1170,6 +1177,7 @@
 				514F221125C4CCE4004E02CD /* EditorTagContentConfiguration.swift in Sources */,
 				51F2859725AD11DB0019C573 /* CollectionsSearchContentConfiguration.swift in Sources */,
 				5115C0362605F96100416D67 /* MacOpenQuicklyDocumentsViewController.swift in Sources */,
+				51B49BB02F66EE3600FDFE62 /* FindRowsEntityQuery.swift in Sources */,
 				511EC2C72B409A5B002D89A5 /* ValueStepper.swift in Sources */,
 				5142C295260AC78C0094571F /* OutlineFontConfig.swift in Sources */,
 				51C71C78273FFA6700F6C779 /* EditorRowContentView.swift in Sources */,

@@ -11,7 +11,7 @@ import VinOutlineKit
 
 struct RowAppEntity: AppEntity {
     static let typeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("label.text.row", comment: "Row"))
-	static let defaultQuery = RowAppEntityQuery()
+	static let defaultQuery = FindRowsEntityQuery()
 
 	@Property(title: LocalizedStringResource("label.text.id", comment: "ID"))
 	var id: EntityID
@@ -51,31 +51,6 @@ struct RowAppEntity: AppEntity {
 		self.expanded = row.isExpanded
 		self.level = row.trueLevel
 	}
-
-    struct RowAppEntityQuery: EntityQuery, ZavalaAppIntent {
-		
-        func entities(for entityIDs: [RowAppEntity.ID]) async throws -> [RowAppEntity] {
-			await resume()
-			
-			var results = [RowAppEntity]()
-			
-			for entityID in entityIDs {
-				if let outline = await appDelegate.accountManager.findDocument(entityID)?.outline {
-					await outline.load()
-					
-					if let row = await outline.findRow(id: entityID.rowUUID) {
-						await results.append(RowAppEntity(row: row))
-					}
-					
-					await outline.unload()
-				}
-			}
-			
-			await suspend()
-			return results
-        }
-
-    }
 
 }
 

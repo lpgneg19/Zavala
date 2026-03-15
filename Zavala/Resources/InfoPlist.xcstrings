@@ -5,9 +5,27 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Zavala"
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Zavala"
           }
         },
@@ -23,6 +41,12 @@
       "comment" : "Spotlight Search Terms",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gliederung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -33,24 +57,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大纲编辑器"
-          }
-        }
-      }
-    },
-    "NSHumanReadableCopyright" : {
-      "comment" : "Copyright (human-readable)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Copyright © 2020-2026 Maurice C. Parker\nAll Rights Reserved."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "版权所有 © 2020-2026 Maurice C. Parker\n保留所有权利。"
           }
         }
       }
@@ -91,13 +97,67 @@
         }
       }
     },
+    "NSHumanReadableCopyright" : {
+      "comment" : "Copyright (human-readable)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2020-2026 Maurice C. Parker\nAlle Rechte vorbehalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copyright © 2020-2026 Maurice C. Parker\nAll Rights Reserved."
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2020-2026 Maurice C. Parker\nAll Rights Reserved."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2020-2026 Maurice C. Parker\nAll Rights Reserved."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版权所有 © 2020-2026 Maurice C. Parker\n保留所有权利。"
+          }
+        }
+      }
+    },
     "NSPhotoLibraryUsageDescription" : {
       "comment" : "Privacy - Photo Library Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala möchte auf Ihre Fotos zugreifen, damit Sie diese in Gliederungen einfügen können."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Zavala wants to use your photos so that you can insert them into outlines."
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala wants to use your photos so that you can insert them into outlines."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Zavala wants to use your photos so that you can insert them into outlines."
           }
         },
@@ -109,11 +169,77 @@
         }
       }
     },
-    "zavala outliner" : {
-
-    },
     "Zavala Outliner" : {
-
+      "comment" : "Spotlight Search Terms",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala Gliederung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala Outliner"
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala Outliner"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala Outliner"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zavala 大纲编辑器"
+          }
+        }
+      }
+    },
+    "zavala outliner" : {
+      "comment" : "Spotlight Search Terms",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zavala gliederung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zavala outliner"
+          }
+        },
+        "en-AU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zavala outliner"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zavala outliner"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zavala 大纲编辑器"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

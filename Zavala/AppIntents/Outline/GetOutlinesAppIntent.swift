@@ -10,7 +10,10 @@ import AppIntents
 import VinOutlineKit
 import VinUtility
 
-struct GetOutlinesAppIntent: AppIntent, CustomIntentMigratedAppIntent, ZavalaAppIntent {
+struct GetOutlinesAppIntent: DeprecatedAppIntent, CustomIntentMigratedAppIntent, ZavalaAppIntent {
+
+	nonisolated(unsafe) static let deprecation: IntentDeprecation = .init(message: "intent.message.get.outlines.deprecated")
+
     static let intentClassName = "GetOutlinesIntent"
     static let title: LocalizedStringResource = LocalizedStringResource("intent.title.get-outlines", comment: "Intent title: Get Outlines")
     static let description = IntentDescription(LocalizedStringResource("intent.description.get-outlines", comment: "Intent title: Get Outlines based on search criteria."))

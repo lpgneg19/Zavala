@@ -9,7 +9,9 @@ import Foundation
 import AppIntents
 import VinOutlineKit
 
-struct GetRowsAppIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent, ZavalaAppIntent {
+struct GetRowsAppIntent: DeprecatedAppIntent, CustomIntentMigratedAppIntent, PredictableIntent, ZavalaAppIntent {
+	nonisolated(unsafe) static let deprecation: IntentDeprecation = .init(message: "intent.message.get.rows.deprecated")
+
     static let intentClassName = "GetRowsIntent"
     static let title: LocalizedStringResource = LocalizedStringResource("intent.title.get-rows", comment: "Get Rows")
     static let description = IntentDescription(LocalizedStringResource("intent.descrption.get-rows-outlines", comment: "Get Rows from an Outline."))
